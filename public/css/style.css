@@ -1,0 +1,57 @@
+.cart {
+    position: relative;
+}
+
+.cart .items {}
+
+.cart .count {
+    position: absolute;
+    left: 10px;
+    top: 0px;
+    font-size: 10px;
+    color: white;
+    background-color: crimson;
+    display: inline-block;
+    min-width: 16px;
+    min-height: 16px;
+    border-radius: 50%;
+    text-align: center;
+}
+
+.card {
+    position: relative;
+}
+
+.card .price {
+    font-size: 14px;
+    margin-top: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    background-color: crimson;
+    color: white;
+}
+
+.gr {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 991px) {
+    .gr {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .gr {
+        grid-template-columns: 1fr;
+    }
+}
+
+footer {
+    background-color: #eee;
+    color: #333;
+}
