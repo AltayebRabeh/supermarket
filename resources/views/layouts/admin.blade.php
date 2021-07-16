@@ -17,9 +17,16 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/magicslideshow.css') }}" />
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap-rtl.css') }}" rel="stylesheet">
+    <style>
+        @media print {
+            .btn {
+                display: none;
+            }
+        }
+
+    </style>
 </head>
 
 <body>
@@ -44,8 +51,9 @@
                                 الاصناف
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('categories.create') }}">إضافة صنف</a>
-                                <a class="dropdown-item" href="{{ route('categories') }}">عرض الاصناف</a>
+                                <a class="dropdown-item text-right" href="{{ route('categories.create') }}">إضافة
+                                    صنف</a>
+                                <a class="dropdown-item text-right" href="{{ route('categories') }}">عرض الاصناف</a>
                             </div>
                         </li>
                         <li class="nav-item dropdown">
@@ -54,12 +62,23 @@
                                 المنتجات
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('products.create') }}">إضافة منتج</a>
-                                <a class="dropdown-item" href="{{ route('products') }}">عرض المنتجات</a>
+                                <a class="dropdown-item text-right" href="{{ route('products.create') }}">إضافة
+                                    منتج</a>
+                                <a class="dropdown-item text-right" href="{{ route('products') }}">عرض المنتجات</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                الفواتير
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item text-right" href="{{ route('bills.done') }}">الفواتير</a>
+                                <a class="dropdown-item text-right" href="{{ route('bills') }}">الطلبيات</a>
                             </div>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">المبيعات</a>
+                            <a class="nav-link" href="{{ route('users') }}">المستخدمين</a>
                         </li>
                     </ul>
 
@@ -85,7 +104,7 @@
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                         onclick="event.preventDefault();
-                                                                                                                                                                                                                                                                                     document.getElementById('logout-form').submit();">
+                                                                                                                                                                                                                                                                                                                                                                         document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
 
@@ -102,8 +121,12 @@
         <main class="py-4">
             @if (session('message'))
                 <div class="container">
-                    <div style="position:rellative" class="alert alert-{{ session('alert-type') }}" role="alert">
+                    <div class="mt-5 alert alert-{{ session('alert-type') }} alert-dismissible fade show"
+                        role="alert">
                         {{ session('message') }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                 </div>
             @endif
@@ -115,6 +138,10 @@
     <script src="{{ asset('js/magicslideshow.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script>
+        $('.alert').fadeIn(5000, function() {
+            $(this).fadeOut(5000);
+        });
+
         $('.add-to-cart-button').click(function() {
             addItemToCart($(this).data('id').value, 5). // paste your id product number
         });

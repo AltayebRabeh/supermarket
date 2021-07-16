@@ -18,6 +18,7 @@ class CreateBillsTable extends Migration
             $table->string('address');
             $table->string('name');
             $table->string('phone');
+            $table->tinyInteger('state')->default(0);
             $table->timestamps();
         });
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -24,14 +25,30 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['category'])->take(4)->get();
+        $products = Product::where('qty', '>', 0)->with(['category'])->take(4)->get();
         return view('index', compact('products'));
     }
 
-    public function shop()
+    public function search(Request $request)
     {
-        $products = Product::with(['category'])->paginate(16);
-        return view('shop', compact('products'));
+        $products = Product::where('qty', '>', 0)
+                            ->with('category')
+                            ->where('name', 'like', '%' . $request->search . '%')
+                            ->paginate(16);
+        $search = $request->search;
+        return view('search', compact('products', 'search'));
+    }
+
+    public function shop(Request $request)
+    {
+        if ($request->has('cat_id')) {
+            $products = Product::where('qty', '>', 0)->whereCategoryId($request->cat_id)->with(['category'])->paginate(16);
+        } else {
+            $products = Product::where('qty', '>', 0)->with(['category'])->paginate(16);
+        }
+
+        $categories = Category::select()->take(6)->get();
+        return view('shop', compact('products', 'categories'));
     }
 
     private $cart;
@@ -49,15 +66,19 @@ class HomeController extends Controller
                     if ($this->cart[$product->id]['qty'] + $request->qty <= $product->qty) {
                         $request->session()->put('cart.' . $product->id, [
                             'name' => $product->name,
-                            'qty' => $this->cart[$product->id]['qty'] += $request->qty, 
-                            'price' => $product->price, 
+                            'qty' => $this->cart[$product->id]['qty'] += $request->qty,
+                            'price' => $product->price,
                             'total' => $this->cart[$product->id]['qty'] * $product->price
                         ]);
+                    } else {
+                        return false;
                     }
                 } else {
                     $this->cart[$product->id] = ['name' => $product->name, 'qty' => $request->qty, 'price' => $product->price, 'total' => $product->price * $request->qty];
                     session()->put('cart', $this->cart);
                 }
+            } else {
+                return false;
             }
         }
     }

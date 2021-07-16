@@ -15,6 +15,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        if (Auth()->user()->permission != 'مدير') {
+            return redirect()->route('dashboard');
+        }
+        
         $categories = Category::select()->paginate(10);
 
         return view('categories.index', compact('categories'));
@@ -27,6 +31,9 @@ class CategoryController extends Controller
      */
     public function create()
     {
+        if (Auth()->user()->permission != 'مدير') {
+            return redirect()->route('dashboard');
+        }
         return view('categories.create');
     }
 
@@ -73,6 +80,10 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
+        if (Auth()->user()->permission != 'مدير') {
+            return redirect()->route('dashboard');
+        }
+
         $category = Category::find($id);
         if($category) {
             return view('categories.edit', compact('category'));

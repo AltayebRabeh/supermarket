@@ -64,6 +64,7 @@
                         @enderror
                     </div>
                 </div>
+                <input type="hidden" name="total" value="{{ $total }}">
                 <div class="col-6">
                     <div class="form-group">
                         <label for="phone">رقم الهاتف</label>

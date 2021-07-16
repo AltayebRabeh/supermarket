@@ -12,4 +12,8 @@ class Bill extends Model
     {
         return $this->hasMany(Sale::class);
     }
+
+    function status() {
+        return $this->state == 0 ? 'لم يتم التسليم' : 'تم التسليم';
+    }
 }

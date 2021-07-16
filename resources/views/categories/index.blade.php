@@ -5,6 +5,8 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header d-flex">{{ __('الاصناف') }}
+                    <a href="javascript:void();" onclick="window.print();"
+                        class="mr-auto btn btn-success btn-sm print">طباعة</a>
                     <a class="btn btn-primary btn-sm mr-auto" href="{{ route('categories.create') }}">صنف جديد</a>
                 </div>
 
@@ -16,7 +18,7 @@
                                     <td>#</td>
                                     <td>اسم الصنف</td>
                                     <td>وصف الصنف</td>
-                                    <td>العمليات</td>
+                                    <td></td>
                                 </tr>
                             </thead>
                             <tbody>

@@ -4,7 +4,10 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
+
                 <div class="card-header d-flex">{{ __('المنتجات') }}
+                    <a href="javascript:void();" onclick="window.print();"
+                        class="mr-auto btn btn-success btn-sm print">طباعة</a>
                     <a class="btn btn-primary btn-sm mr-auto" href="{{ route('products.create') }}">منتج جديد</a>
                 </div>
 
@@ -20,7 +23,7 @@
                                     <td>الكمية</td>
                                     <td>السعر</td>
                                     <td>التاريخ</td>
-                                    <td>العمليات</td>
+                                    <td></td>
                                 </tr>
                             </thead>
                             <tbody>

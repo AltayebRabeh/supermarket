@@ -3,90 +3,53 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bill;
+use App\Models\Pay;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class BillController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        if (Auth()->user()->permission != 'مدير' && Auth()->user()->permission != 'مشرف فواتير') {
+            return redirect()->route('dashboard');
+        }
+        $bills = Bill::whereState(0)->select()->paginate(10);
+        return view('bills.index', compact('bills'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function done()
     {
-        //
+        if (Auth()->user()->permission != 'مدير' && Auth()->user()->permission != 'مشرف طلبيات') {
+            return redirect()->route('dashboard');
+        }
+        $bills = Bill::whereState(1)->select()->paginate(10);
+        return view('bills.done', compact('bills'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function billDetails($id)
     {
-        //
+        $bill = Bill::whereId($id)->with('sales')->first();
+        return view('bills.bill', compact('bill'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Bill  $bill
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Bill $bill)
+    public function change($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Bill  $bill
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Bill $bill)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Bill  $bill
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Bill $bill)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Bill  $bill
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Bill $bill)
-    {
-        //
+        Bill::whereId($id)->update(['state' => 1]);
+        return redirect()->route('bills');
     }
 
     public function pay(Request $request)
     {
+        if (!session()->has('cart')) {
+            return redirect()->route('cart')->with([
+                'message' => 'العربة فارغة ',
+                'alert-type' => 'danger'
+            ]);
+        }
+
         $validate = Validator::make($request->all(), [
             'name' => 'required|min:10',
             'phone' => 'required',
@@ -101,6 +64,28 @@ class BillController extends Controller
             return redirect()->route('cart')->withErrors($validate);
         }
 
+        $pay = Pay::whereAcountNumber($request->card_number)->first();
+        if (! $pay){
+            return redirect()->route('cart')->with([
+                'message' => 'الرجاء مراجعة بيانات البطاقة ',
+                'alert-type' => 'danger'
+                ]);
+        } else {
+            if(!password_verify($request->password, $pay->password)) {
+               return redirect()->route('cart')->with([
+                'message' => 'الرجاء مراجعة بيانات البطاقة ',
+                'alert-type' => 'danger'
+                ]);
+            }
+        }
+
+        if ($pay->money < $request->total) {
+            return redirect()->route('cart')->with([
+               'message' => 'رصيدك غير كافي',
+               'alert-type' => 'danger'
+            ]);
+        }
+
         $data['name'] = $request->name;
         $data['phone'] = $request->phone;
         $data['address'] = $request->address1 . ' ,' . $request->address2 . ' ,' . $request->address3;
@@ -110,21 +95,36 @@ class BillController extends Controller
             $bill = Bill::create($data);
 
             foreach(session()->get('cart') as $key => $item) {
-                $bill->sales()->create(['qty' => $item['qty'], 'product_id' => $key]);
+                $bill->sales()->create(['qty' => $item['qty'], 'price' => $item['price'], 'product_id' => $key]);
+                $product = Product::find($key);
+                $product->update(['qty' => $product->qty - $item['qty']]);
             }
 
+            $supermarket = Pay::whereAcountNumber('5574693154879688')->first();
+
+            $supermarket->update(['money' => $supermarket->money + $request->total]);
+            $pay->update(['money' => $pay->money - $request->total]);
+
             DB::commit();
+            
             session()->flash('cart');
-            return redirect()->route('index')->with([
+            
+            return redirect()->route('bill', $bill->id)->with([
                'message' => 'تمت العملية بنجاح',
-               'alert-type' => 'success' 
+               'alert-type' => 'success'
             ]);
         } catch(\Exception $e) {
             DB::rollBack();
             return redirect()->route('index')->with([
                'message' => 'عذراً حصل خطأ ما الرجاء المحاولة لاحقاً',
-               'alert-type' => 'danger' 
+               'alert-type' => 'danger'
             ]);
         }
+    }
+
+    public function bill($id)
+    {
+        $bill = Bill::whereId($id)->with('sales')->first();
+        return view('bill', compact('bill'));
     }
 }

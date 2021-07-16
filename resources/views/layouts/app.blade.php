@@ -51,6 +51,12 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('contact-us') }}">إتصل بنا</a>
                         </li>
+                        <li class="nav-item">
+                            <form class="d-flex" action="{{ route('search') }}" method="GET">
+                                <input class="form-control mx-2" name="search" placeholder="إبحث عن منتجاتك">
+                                <button type="submit" class="btn btn-outline-secondary" type="button">بحث</button>
+                            </form>
+                        </li>
                         <li class="nav-item pr-5 cart">
                             <a class="nav-link" href="{{ route('cart') }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -66,10 +72,15 @@
             </div>
         </nav>
         <main class="pb-4">
+            <div class="container msg"></div>
             @if (session('message'))
                 <div class="container">
-                    <div style="position:rellative" class="alert alert-{{ session('alert-type') }}" role="alert">
+                    <div class="mt-5 alert alert-{{ session('alert-type') }} alert-dismissible fade show"
+                        role="alert">
                         {{ session('message') }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                 </div>
             @endif
@@ -83,6 +94,10 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script>
+        $('.alert').fadeIn(5000, function() {
+            $(this).fadeOut(5000);
+        });
+
         function cartCount() {
             let _token = "{{ csrf_token() }}";
 
@@ -118,7 +133,11 @@
                     // _token: _token
                 },
                 success: function(data) {
-                    console.log(data);
+                    if (data == false) {
+                        $('.msg').append(
+                            '<div class="mt-5 alert alert-danger alert-dismissible fade show" role="alert">لاتوجد كمية كافية لطلبك</div>'
+                        );
+                    }
                 },
                 error: function(reject) {
 

@@ -55,3 +55,22 @@ footer {
     background-color: #eee;
     color: #333;
 }
+
+@media print {
+    .btn {
+        display: none;
+    }
+}
+
+.categories {
+    list-style: none;
+}
+
+.categories li {
+    display: inline-block;
+}
+
+.categories li a {
+    text-decoration: none;
+    font-size: 18px
+}

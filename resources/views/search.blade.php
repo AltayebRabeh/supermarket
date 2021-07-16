@@ -2,14 +2,7 @@
 
 @section('content')
     <div class="container text-center">
-        <h2 class="my-4">التسوق</h2>
-        <ul class="categories">
-            @forelse ($categories as $category)
-                <li><a href="{{ route('shop') }}?cat_id={{ $category->id }}">{{ $category->name }}</a></li>
-            @empty
-
-            @endforelse
-        </ul>
+        <h2 class="my-4">بحث عن ' {{ $search }} '</h2>
         <div class="gr">
             @foreach ($products as $product)
                 <div class="card">

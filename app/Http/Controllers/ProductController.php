@@ -16,6 +16,10 @@ class ProductController extends Controller
      */
     public function index()
     {
+        if (Auth()->user()->permission != 'مدير' && Auth()->user()->permission != 'مشرف منتجات') {
+            return redirect()->route('dashboard');
+        }
+        
         $products = Product::with(['category'])->paginate(10);
 
         return view('products.index', compact('products'));
@@ -28,6 +32,9 @@ class ProductController extends Controller
      */
     public function create()
     {
+        if (Auth()->user()->permission != 'مدير' && Auth()->user()->permission != 'مشرف منتجات') {
+            return redirect()->route('dashboard');
+        }
         $categories = Category::all();
 
         return view('products.create', compact('categories'));
@@ -91,6 +98,9 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
+        if (Auth()->user()->permission != 'مدير' && Auth()->user()->permission != 'مشرف منتجات') {
+            return redirect()->route('dashboard');
+        }
         $product = Product::with(['category'])->find($id);
         $categories = Category::all();
         if($product) {
